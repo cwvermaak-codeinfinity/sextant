@@ -97,10 +97,31 @@ async function forward(request: Tina4Request, path: string, init: RequestInit = 
 // them means a new backend route silently 404s here until someone remembers,
 // and the frontend has no business knowing the route list.
 
+// Tina4 hands this over as an ABSOLUTE url ("http://localhost:7148/api/me") on
+// some versions and as a bare path ("/api/me") on others. Splitting on "?" and
+// concatenating the result onto BACKEND produced
+//
+//     http://backend:7145http://localhost:7148/api/me
+//
+// which fetch rejects with "Failed to parse URL" — so EVERY /api call through
+// this proxy returned 500 while the backend itself was healthy and answering
+// the same path correctly. Parsing it properly handles both shapes.
+function pathAndQuery(request: Tina4Request): { path: string; query: string } {
+  const raw = String((request as any).url ?? (request as any).path ?? "");
+  try {
+    const parsed = new URL(raw);
+    return { path: parsed.pathname, query: parsed.search };
+  } catch {
+    const bare = raw.startsWith("/") ? raw : "/" + raw;
+    const cut = bare.indexOf("?");
+    return cut === -1
+      ? { path: bare, query: "" }
+      : { path: bare.slice(0, cut), query: bare.slice(cut) };
+  }
+}
+
 async function proxy(request: Tina4Request, response: Tina4Response, method: string) {
-  const url = (request as any).url ?? (request as any).path ?? "";
-  const path = String(url).split("?")[0];
-  const query = String(url).includes("?") ? "?" + String(url).split("?").slice(1).join("?") : "";
+  const { path, query } = pathAndQuery(request);
 
   const init: RequestInit = { method };
   if (method !== "GET") {

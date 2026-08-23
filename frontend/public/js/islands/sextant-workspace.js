@@ -257,20 +257,20 @@
             </div>
           </div>
           <div class="row" style="margin-top:8px; align-items:center">
-            <button class="btn primary" onclick=${() => this.runFind(0)}>Run</button>
+            <button class="btn primary" @click=${() => this.runFind(0)}>Run</button>
             ${S.connection() && S.connection().writable
-              ? html`<button class="btn" onclick=${() => this.insertDoc()}>Insert document</button>`
+              ? html`<button class="btn" @click=${() => this.insertDoc()}>Insert document</button>`
               : ""}
             <span class="spacer" style="margin-left:auto"></span>
             <span class="viewtoggle">
               ${VIEWS.map(([id, label]) => html`
                 <button class="vbtn" aria-selected=${String(this.view.value === id)}
-                        onclick=${() => this.view.value = id}>${label}</button>
+                        @click=${() => this.view.value = id}>${label}</button>
               `)}
             </span>
             <button class="btn" disabled=${this.skip.value === 0}
-                    onclick=${() => this.runFind(Math.max(0, this.skip.value - this.limit.value))}>Previous</button>
-            <button class="btn" onclick=${() => this.runFind(this.skip.value + this.limit.value)}>Next</button>
+                    @click=${() => this.runFind(Math.max(0, this.skip.value - this.limit.value))}>Previous</button>
+            <button class="btn" @click=${() => this.runFind(this.skip.value + this.limit.value)}>Next</button>
           </div>
         </div>
       `;
@@ -301,8 +301,8 @@
                 <span class="id">${S.idLabel(doc)}</span>
                 <span class="actions">
                   ${writable ? html`
-                    <button class="btn" onclick=${() => this.edit(doc)}>Edit</button>
-                    <button class="btn danger" onclick=${() => this.removeDoc(doc)}>Delete</button>
+                    <button class="btn" @click=${() => this.edit(doc)}>Edit</button>
+                    <button class="btn danger" @click=${() => this.removeDoc(doc)}>Delete</button>
                   ` : ""}
                 </span>
               </div>
@@ -322,7 +322,7 @@
           <div class="doc-head">
             <span>${docs.length} document${docs.length === 1 ? "" : "s"}</span>
             <span class="actions">
-              <button class="btn" onclick=${(e) => this.copyJson(e, docs)}>Copy</button>
+              <button class="btn" @click=${(e) => this.copyJson(e, docs)}>Copy</button>
             </span>
           </div>
           <pre innerHTML=${S.highlight(docs)}></pre>
@@ -376,8 +376,8 @@
                   `)}
                   ${writable ? html`
                     <td class="row-actions">
-                      <button class="btn" onclick=${() => this.edit(doc)}>Edit</button>
-                      <button class="btn danger" onclick=${() => this.removeDoc(doc)}>Delete</button>
+                      <button class="btn" @click=${() => this.edit(doc)}>Edit</button>
+                      <button class="btn danger" @click=${() => this.removeDoc(doc)}>Delete</button>
                     </td>
                   ` : ""}
                 </tr>
@@ -413,7 +413,7 @@
                   <td>${e.affected === null ? "" : e.affected}</td>
                   <td>
                     ${e.pre_image
-                      ? html`<button class="btn" onclick=${() => this.undo(e)}>Put back</button>`
+                      ? html`<button class="btn" @click=${() => this.undo(e)}>Put back</button>`
                       : ""}
                   </td>
                 </tr>
@@ -436,7 +436,7 @@
             <textarea data-q="pipeline" rows="8" spellcheck="false"
                       placeholder='[ { "$match": { } }, { "$limit": 20 } ]'></textarea>
             <div class="row" style="margin-top:8px">
-              <button class="btn primary" onclick=${() => this.runAggregate()}>Run</button>
+              <button class="btn primary" @click=${() => this.runAggregate()}>Run</button>
               <span style="margin-left:10px; color:var(--ink-faint); font-size:12px">
                 $out and $merge are refused — they write, and a write must go through
                 the editor so it is recorded.
@@ -459,7 +459,7 @@
         return html`
           ${this.renderQueryBar()}
           <div class="row" style="margin-bottom:10px">
-            <button class="btn primary" onclick=${() => this.runExplain()}>Explain</button>
+            <button class="btn primary" @click=${() => this.runExplain()}>Explain</button>
           </div>
           ${this.explainOut.value
             ? html`<div class="doc"><pre innerHTML=${S.highlight(this.explainOut.value)}></pre></div>`
@@ -497,7 +497,7 @@
           <div class="tabs">
             ${TABS.map(([id, label]) => html`
               <button class="tab" aria-selected=${String(tab === id)}
-                      onclick=${() => { S.tab.value = id; this.maybeLoad(true); }}>${label}</button>
+                      @click=${() => { S.tab.value = id; this.maybeLoad(true); }}>${label}</button>
             `)}
           </div>
 
@@ -519,9 +519,9 @@
                 <textarea data-q="editor" rows="16" spellcheck="false">${editing.json}</textarea>
               </div>
               <div class="foot">
-                <button class="btn" onclick=${() => this.editing.value = null}>Cancel</button>
+                <button class="btn" @click=${() => this.editing.value = null}>Cancel</button>
                 <button class="btn primary"
-                        onclick=${() => (editing.doc ? this.saveEdit() : this.saveInsert())}>
+                        @click=${() => (editing.doc ? this.saveEdit() : this.saveInsert())}>
                   ${editing.doc ? "Save" : "Insert"}
                 </button>
               </div>
@@ -537,9 +537,9 @@
                 <p>${confirming.body}</p>
               </div>
               <div class="foot">
-                <button class="btn" onclick=${() => this.confirming.value = null}>Cancel</button>
+                <button class="btn" @click=${() => this.confirming.value = null}>Cancel</button>
                 <button class=${"btn " + (confirming.danger ? "danger" : "primary")}
-                        onclick=${() => confirming.run()}>Confirm</button>
+                        @click=${() => confirming.run()}>Confirm</button>
               </div>
             </div>
           </div>

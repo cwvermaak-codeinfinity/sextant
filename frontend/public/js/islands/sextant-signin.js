@@ -62,7 +62,7 @@
               <p class="or">or use the break-glass credential</p>
             ` : ""}
 
-            <form onsubmit=${(e) => this.submit(e)}>
+            <form @submit=${(e) => this.submit(e)}>
               <label>
                 Username
                 <input type="text" name="username" autocomplete="username" autofocus />

@@ -93,6 +93,42 @@ def _from_local_token(auth, token):
     return {"username": username, "groups": [], "via": "local"}
 
 
+def bearer(request):
+    """The Bearer token from the Authorization header, or "".
+
+    This was CALLED but never defined — `identify()` raised
+    `NameError: name 'bearer' is not defined`, so /api/me returned 500 for every
+    caller, authenticated or not. The console calls /api/me immediately after
+    sign-in, so a successful login still landed back on the sign-in screen with
+    the reason only in the backend log.
+
+    Written defensively about the header container because it is not worth
+    coupling this to one framework's request shape: it may be a dict, an items()
+    mapping, or absent. Header names are case-insensitive per RFC 9110, so the
+    lookup is too — several frameworks normalise to lower case and several do
+    not.
+    """
+    headers = getattr(request, "headers", None) or {}
+    if not isinstance(headers, dict):
+        try:
+            headers = dict(headers)
+        except Exception:
+            return ""
+
+    raw_value = ""
+    for key, value in headers.items():
+        if str(key).strip().lower() == "authorization":
+            raw_value = str(value or "")
+            break
+    if not raw_value:
+        return ""
+
+    parts = raw_value.split(None, 1)
+    if len(parts) == 2 and parts[0].lower() == "bearer":
+        return parts[1].strip()
+    return ""
+
+
 def identify(config, request):
     """Resolve the caller from the bearer token, or raise AuthError.
 

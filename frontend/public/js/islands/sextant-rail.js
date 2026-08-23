@@ -97,7 +97,7 @@
               ? html`<div class="empty">No connections are available to you.</div>`
               : conns.map((c) => html`
                   <div class="tree-item" aria-current=${String(c.id === activeConn)}
-                       onclick=${() => this.pickConnection(c.id)}>
+                       @click=${() => this.pickConnection(c.id)}>
                     <span>${c.name}</span>
                     <span class=${"badge " + (c.writable ? "rw" : "ro")}>
                       ${c.writable ? "rw" : "ro"}
@@ -113,7 +113,7 @@
                   ? html`<div class="empty">Nothing this credential can see.</div>`
                   : this.databases.value.map((d) => html`
                       <div class="tree-item db" aria-current=${String(d.name === activeDb)}
-                           onclick=${() => this.pickDatabase(d.name)}>
+                           @click=${() => this.pickDatabase(d.name)}>
                         <span>${d.name}</span>
                       </div>
                       ${d.name === activeDb ? html`
@@ -121,7 +121,7 @@
                           ? html`<div class="empty">Loading…</div>`
                           : this.collections.value.map((c) => html`
                               <div class="tree-item col" aria-current=${String(c.name === activeCol)}
-                                   onclick=${() => this.pickCollection(c.name)}>
+                                   @click=${() => this.pickCollection(c.name)}>
                                 <span>${c.name}</span>
                                 <span class="count">
                                   ${c.estimated_count === null ? "?" : c.estimated_count}

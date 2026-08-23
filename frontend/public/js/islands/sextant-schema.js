@@ -81,7 +81,7 @@
       const open = this.expanded.value[field.path];
       return html`
         <div class=${"field" + (field.mixed_types ? " mixed" : "")}>
-          <div class="field-head" onclick=${() => this.toggle(field.path)}>
+          <div class="field-head" @click=${() => this.toggle(field.path)}>
             <span class="path">${field.path}</span>
             <span class="types">
               ${field.types.map((t) => html`
@@ -139,7 +139,7 @@
       const report = this.report.value;
       if (!report) {
         return html`<div class="empty">
-          <button class="btn primary" onclick=${() => this.load(true)}>Analyse schema</button>
+          <button class="btn primary" @click=${() => this.load(true)}>Analyse schema</button>
         </div>`;
       }
 
@@ -153,10 +153,10 @@
                 <label>Sample size</label>
                 <input type="number" data-q="sample" value=${String(this.sample.value)}
                        min="1" max="10000"
-                       onchange=${(e) => this.sample.value = Number(e.target.value) || 1000} />
+                       @change=${(e) => this.sample.value = Number(e.target.value) || 1000} />
               </div>
               <button class="btn primary" style="margin-top:16px"
-                      onclick=${() => this.load(true)}>Re-sample</button>
+                      @click=${() => this.load(true)}>Re-sample</button>
               <span style="margin-left:auto; font-size:12px; color:var(--ink-faint)">
                 ${report.sampled} document${report.sampled === 1 ? "" : "s"} sampled
                 ${report.collection_total !== null
