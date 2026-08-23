@@ -113,8 +113,21 @@ async function proxy(request: Tina4Request, response: Tina4Response, method: str
 get("/api/*", async (request: Tina4Request, response: Tina4Response) =>
   proxy(request, response, "GET"));
 
+// .noAuth() on every POST, and it is load-bearing.
+//
+// tina4-nodejs defaults auth_required to `method not in (GET, HEAD, OPTIONS)`,
+// so a POST route sits behind the framework's OWN auth scheme unless it opts
+// out. Nothing reaches the handler and the caller gets a bare
+// {"error":"Unauthorized"} — which reads like the backend rejecting the
+// credentials rather than the request never having left this process.
+//
+// This was live: POST /sign-in returned 401 while the backend returned 200 with
+// a valid token for the same credentials. It went unnoticed because production
+// signs in through OIDC and never touches this path — but this path IS the
+// break-glass route for when the identity provider is itself the outage, so it
+// was broken in exactly the situation it exists for.
 post("/api/*", async (request: Tina4Request, response: Tina4Response) =>
-  proxy(request, response, "POST"));
+  proxy(request, response, "POST")).noAuth();
 
 // ── sign-in ────────────────────────────────────────────────────────────────
 
@@ -149,7 +162,7 @@ post("/sign-in", async (request: Tina4Request, response: Tina4Response) => {
   return response(
     JSON.stringify({ username: who.username, via: who.via }),
     200, "application/json");
-});
+}).noAuth();
 
 get("/sign-out", async (request: Tina4Request, response: Tina4Response) => {
   const store = session(request);
