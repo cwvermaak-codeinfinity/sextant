@@ -40,31 +40,31 @@
     onMount() { this.load(); }
 
     key() {
-      return [S.connectionId(), S.database(), S.collection()].join("|");
+      return [S.connectionId.value, S.database.value, S.collection.value].join("|");
     }
 
     async load(force) {
       const k = this.key();
       if (!force && k === this._lastKey) return;
-      if (!S.connectionId() || !S.database() || !S.collection()) return;
+      if (!S.connectionId.value || !S.database.value || !S.collection.value) return;
       this._lastKey = k;
 
-      this.loading.set(true);
-      this.failed.set(null);
+      this.loading.value = true;
+      this.failed.value = null;
       const r = await S.api(
-        `/api/${encodeURIComponent(S.connectionId())}` +
-        `/${encodeURIComponent(S.database())}` +
-        `/${encodeURIComponent(S.collection())}/schema`,
-        { method: "POST", body: { sample: this.sample() } });
-      this.loading.set(false);
-      if (!r.ok) { this.failed.set(r.error); this.report.set(null); return; }
-      this.report.set(r.data);
+        `/api/${encodeURIComponent(S.connectionId.value)}` +
+        `/${encodeURIComponent(S.database.value)}` +
+        `/${encodeURIComponent(S.collection.value)}/schema`,
+        { method: "POST", body: { sample: this.sample.value } });
+      this.loading.value = false;
+      if (!r.ok) { this.failed.value = r.error; this.report.value = null; return; }
+      this.report.value = r.data;
     }
 
     toggle(path) {
-      const open = Object.assign({}, this.expanded());
+      const open = Object.assign({}, this.expanded.value);
       open[path] = !open[path];
-      this.expanded.set(open);
+      this.expanded.value = open;
     }
 
     renderBar(field) {
@@ -78,7 +78,7 @@
     }
 
     renderField(field) {
-      const open = this.expanded()[field.path];
+      const open = this.expanded.value[field.path];
       return html`
         <div class=${"field" + (field.mixed_types ? " mixed" : "")}>
           <div class="field-head" onclick=${() => this.toggle(field.path)}>
@@ -127,16 +127,16 @@
     }
 
     render() {
-      if (!S.collection()) {
+      if (!S.collection.value) {
         return html`<div class="empty">Pick a collection on the left.</div>`;
       }
-      if (this.loading()) {
+      if (this.loading.value) {
         return html`<div class="empty">Sampling…</div>`;
       }
-      if (this.failed()) {
-        return html`<div class="notice bad">${this.failed()}</div>`;
+      if (this.failed.value) {
+        return html`<div class="notice bad">${this.failed.value}</div>`;
       }
-      const report = this.report();
+      const report = this.report.value;
       if (!report) {
         return html`<div class="empty">
           <button class="btn primary" onclick=${() => this.load(true)}>Analyse schema</button>
@@ -151,9 +151,9 @@
             <div class="row" style="align-items:center">
               <div class="narrow">
                 <label>Sample size</label>
-                <input type="number" data-q="sample" value=${String(this.sample())}
+                <input type="number" data-q="sample" value=${String(this.sample.value)}
                        min="1" max="10000"
-                       onchange=${(e) => this.sample.set(Number(e.target.value) || 1000)} />
+                       onchange=${(e) => this.sample.value = Number(e.target.value) || 1000} />
               </div>
               <button class="btn primary" style="margin-top:16px"
                       onclick=${() => this.load(true)}>Re-sample</button>

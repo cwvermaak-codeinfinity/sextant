@@ -24,8 +24,8 @@
   const busy = signal(false);
 
   function connection() {
-    const id = connectionId();
-    return (me()?.connections || []).find((c) => c.id === id) || null;
+    const id = connectionId.value;
+    return (me.value?.connections || []).find((c) => c.id === id) || null;
   }
 
   /* Fetch JSON and always return the same shape. A rejected promise nobody
@@ -33,8 +33,8 @@
    * console. */
   async function api(path, options) {
     options = options || {};
-    busy.set(true);
-    error.set(null);
+    busy.value = true;
+    error.value = null;
     try {
       const response = await fetch(path, {
         method: options.method || "GET",
@@ -62,19 +62,19 @@
     } catch (e) {
       return { ok: false, status: 0, error: "could not reach the server: " + e.message };
     } finally {
-      busy.set(false);
+      busy.value = false;
     }
   }
 
   async function loadMe() {
     const r = await api("/api/me");
     if (r.ok) {
-      me.set(r.data);
-      if (!connectionId() && r.data.connections && r.data.connections.length) {
-        connectionId.set(r.data.connections[0].id);
+      me.value = r.data;
+      if (!connectionId.value && r.data.connections && r.data.connections.length) {
+        connectionId.value = r.data.connections[0].id;
       }
     } else if (r.status !== 401) {
-      error.set(r.error);
+      error.value = r.error;
     }
     return r;
   }

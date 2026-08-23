@@ -31,56 +31,56 @@
      * This is called from onMount and from the click handlers instead, and it
      * guards against refetching what it already has. */
     async refresh() {
-      const conn = S.connectionId();
+      const conn = S.connectionId.value;
       if (conn && conn !== this._lastConnection) {
         this._lastConnection = conn;
         this._lastDatabase = null;
-        this.collections.set([]);
-        this.loadingDbs.set(true);
+        this.collections.value = [];
+        this.loadingDbs.value = true;
         const r = await S.api(`/api/${encodeURIComponent(conn)}/databases`);
-        this.loadingDbs.set(false);
-        if (r.ok) { this.databases.set(r.data.databases || []); this.failed.set(null); }
-        else { this.databases.set([]); this.failed.set(r.error); }
+        this.loadingDbs.value = false;
+        if (r.ok) { this.databases.value = r.data.databases || []; this.failed.value = null; }
+        else { this.databases.value = []; this.failed.value = r.error; }
       }
 
-      const db = S.database();
+      const db = S.database.value;
       if (conn && db && db !== this._lastDatabase) {
         this._lastDatabase = db;
-        this.loadingCols.set(true);
+        this.loadingCols.value = true;
         const r = await S.api(
           `/api/${encodeURIComponent(conn)}/${encodeURIComponent(db)}/collections`);
-        this.loadingCols.set(false);
-        if (r.ok) { this.collections.set(r.data.collections || []); this.failed.set(null); }
-        else { this.collections.set([]); this.failed.set(r.error); }
+        this.loadingCols.value = false;
+        if (r.ok) { this.collections.value = r.data.collections || []; this.failed.value = null; }
+        else { this.collections.value = []; this.failed.value = r.error; }
       }
     }
 
     pickConnection(id) {
-      if (S.connectionId() === id) return;
-      S.connectionId.set(id);
-      S.database.set(null);
-      S.collection.set(null);
+      if (S.connectionId.value === id) return;
+      S.connectionId.value = id;
+      S.database.value = null;
+      S.collection.value = null;
       this.refresh();
     }
 
     pickDatabase(name) {
-      if (S.database() === name) return;
-      S.database.set(name);
-      S.collection.set(null);
+      if (S.database.value === name) return;
+      S.database.value = name;
+      S.collection.value = null;
       this.refresh();
     }
 
     pickCollection(name) {
-      S.collection.set(name);
-      S.tab.set("documents");
+      S.collection.value = name;
+      S.tab.value = "documents";
     }
 
     render() {
-      const me = S.me();
+      const me = S.me.value;
       const conns = (me && me.connections) || [];
-      const activeConn = S.connectionId();
-      const activeDb = S.database();
-      const activeCol = S.collection();
+      const activeConn = S.connectionId.value;
+      const activeDb = S.database.value;
+      const activeCol = S.collection.value;
 
       return html`
         <aside class="rail">
@@ -90,7 +90,7 @@
           </div>
 
           <div class="rail-body">
-            ${this.failed() ? html`<div class="notice bad" style="margin:10px">${this.failed()}</div>` : ""}
+            ${this.failed.value ? html`<div class="notice bad" style="margin:10px">${this.failed.value}</div>` : ""}
 
             <h2>Connections</h2>
             ${conns.length === 0
@@ -107,19 +107,19 @@
 
             ${activeConn ? html`
               <h2>Databases</h2>
-              ${this.loadingDbs()
+              ${this.loadingDbs.value
                 ? html`<div class="empty">Loading…</div>`
-                : this.databases().length === 0
+                : this.databases.value.length === 0
                   ? html`<div class="empty">Nothing this credential can see.</div>`
-                  : this.databases().map((d) => html`
+                  : this.databases.value.map((d) => html`
                       <div class="tree-item db" aria-current=${String(d.name === activeDb)}
                            onclick=${() => this.pickDatabase(d.name)}>
                         <span>${d.name}</span>
                       </div>
                       ${d.name === activeDb ? html`
-                        ${this.loadingCols()
+                        ${this.loadingCols.value
                           ? html`<div class="empty">Loading…</div>`
-                          : this.collections().map((c) => html`
+                          : this.collections.value.map((c) => html`
                               <div class="tree-item col" aria-current=${String(c.name === activeCol)}
                                    onclick=${() => this.pickCollection(c.name)}>
                                 <span>${c.name}</span>

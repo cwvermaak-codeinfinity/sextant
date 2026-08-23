@@ -26,14 +26,14 @@
 
     async onMount() {
       await S.loadMe();
-      this.checked.set(true);
+      this.checked.value = true;
     }
 
     render() {
-      if (!this.checked()) {
+      if (!this.checked.value) {
         return html`<div class="empty">Loading…</div>`;
       }
-      if (!S.me()) {
+      if (!S.me.value) {
         return html`<sextant-signin></sextant-signin>`;
       }
       return html`

@@ -27,21 +27,21 @@
       const username = form.querySelector('[name="username"]').value;
       const password = form.querySelector('[name="password"]').value;
 
-      this.working.set(true);
-      this.failed.set(null);
+      this.working.value = true;
+      this.failed.value = null;
       const r = await S.api("/sign-in", { method: "POST", body: { username, password } });
-      this.working.set(false);
+      this.working.value = false;
 
       if (!r.ok) {
-        this.failed.set(r.error);
+        this.failed.value = r.error;
         return;
       }
       await S.loadMe();
     }
 
     render() {
-      const failed = this.failed();
-      const working = this.working();
+      const failed = this.failed.value;
+      const working = this.working.value;
       // Read off <sextant-app>, which the server rendered. An inline <script>
       // carrying this would be blocked by `default-src 'self'` and the button
       // would simply never appear.
