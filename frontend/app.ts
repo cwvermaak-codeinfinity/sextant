@@ -196,9 +196,13 @@ get("/sign-out", async (request: Tina4Request, response: Tina4Response) => {
   // no-op and the next person at that machine is still them.
   if (OIDC_ENABLED && tokens?.id_token) {
     const host = (request as any).headers?.host;
-    return response.redirect(logoutUrl(tokens.id_token, `https://${host}/`));
+  // Land on ?signed-out=1, not "/". The shell now sends an unauthenticated
+  // visitor straight back to the provider, so a bare "/" would bounce someone
+  // who just signed out into the provider's login page -- there would be no way
+  // to STAY signed out. The parameter tells the shell to leave them alone.
+    return response.redirect(logoutUrl(tokens.id_token, `https://${host}/?signed-out=1`));
   }
-  return response.redirect("/");
+  return response.redirect("/?signed-out=1");
 });
 
 // ── single sign-on ─────────────────────────────────────────────────────────
