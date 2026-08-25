@@ -6,6 +6,18 @@
  * `value=` inside a reactive render rewrites the field on every keystroke and
  * throws the caret to the end, which makes editing a JSON document impossible.
  */
+/* PROPERTY bindings use a leading dot: `.innerHTML=${...}`.
+ *
+ * Without the dot tina4js treats it as an ordinary attribute and calls
+ * setAttribute("innerHTML", ...). `<td innerHTML="...">` is not a thing: the
+ * attribute is set, the element stays EMPTY, and nothing is logged. The grid
+ * rendered a header row and 393 blank rows against a table that had 393 rows in
+ * it, which reads as "no data" rather than "the binding did nothing".
+ *
+ * Same family as `@click` (see reference-tina4js-event-binding): `@` for events,
+ * `.` for properties, and the bare form silently does something useless.
+ * Found 2026-08-25, six occurrences across the two consoles.
+ */
 (function () {
   const { signal, html, Tina4Element } = Tina4;
   const S = window.Sextant;
@@ -306,7 +318,7 @@
                   ` : ""}
                 </span>
               </div>
-              <pre innerHTML=${S.highlight(doc)}></pre>
+              <pre .innerHTML=${S.highlight(doc)}></pre>
             </div>
           `)}
         </div>
@@ -325,7 +337,7 @@
               <button class="btn" @click=${(e) => this.copyJson(e, docs)}>Copy</button>
             </span>
           </div>
-          <pre innerHTML=${S.highlight(docs)}></pre>
+          <pre .innerHTML=${S.highlight(docs)}></pre>
         </div>
       `;
     }
@@ -371,7 +383,7 @@
                     <td class=${doc[c] === undefined ? "absent" : ""}>
                       ${doc[c] === undefined
                         ? html`<span class="absent-mark">—</span>`
-                        : html`<code innerHTML=${S.highlight(doc[c])}></code>`}
+                        : html`<code .innerHTML=${S.highlight(doc[c])}></code>`}
                     </td>
                   `)}
                   ${writable ? html`
@@ -453,7 +465,7 @@
         const ix = this.indexes.value;
         if (!ix.length) return html`<div class="empty">No indexes.</div>`;
         return html`<div>${ix.map((i) => html`
-          <div class="doc"><pre innerHTML=${S.highlight(i)}></pre></div>`)}</div>`;
+          <div class="doc"><pre .innerHTML=${S.highlight(i)}></pre></div>`)}</div>`;
       }
       if (tab === "explain") {
         return html`
@@ -462,7 +474,7 @@
             <button class="btn primary" @click=${() => this.runExplain()}>Explain</button>
           </div>
           ${this.explainOut.value
-            ? html`<div class="doc"><pre innerHTML=${S.highlight(this.explainOut.value)}></pre></div>`
+            ? html`<div class="doc"><pre .innerHTML=${S.highlight(this.explainOut.value)}></pre></div>`
             : html`<div class="empty">Run a query to see its plan.</div>`}
         `;
       }
